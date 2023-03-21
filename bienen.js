@@ -12,7 +12,7 @@ let restzeit = 0;
 let startzeit = new Date();
 
 $(document).ready(function() {
-	takt = window.setInterval(taktung, 100);
+	takt = window.setInterval(taktung, 10);
 	var spielbrett = document.getElementById('Leinwand');
 	spielfeld = spielbrett.getContext('2d');
 	let spielfigur = new Image();
