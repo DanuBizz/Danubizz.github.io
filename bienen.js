@@ -10,9 +10,11 @@ let score = 0;
 let spielzeit = 45;
 let restzeit = 0;
 let startzeit = new Date();
+let gegnerpositionen = [1, 10, 60, 100, 150, 296];
+let gegnerbewegung = [2, 3, -2, 4, 5, -3];
 
 $(document).ready(function() {
-	takt = window.setInterval(taktung, 10);
+	takt = window.setInterval(taktung, 150);
 	var spielbrett = document.getElementById('Leinwand');
 	spielfeld = spielbrett.getContext('2d');
 	let spielfigur = new Image();
@@ -21,8 +23,7 @@ $(document).ready(function() {
 	spielfigur.onload = function() {
 		spielfeld.drawImage(spielfigur,x,y);
 	}
-	
-	
+
 	function zeichneZielfeld() {
 		let zielfeld = new Image();
 		zielfeld.src = 'bilder/zielbereich.png';
@@ -36,7 +37,9 @@ $(document).ready(function() {
 		spielfeld.clearRect(0,0,600,480);
 		zeichneZielfeld();
 		spielfeld.drawImage(spielfigur,x,y);
+		kollisionspruefungGegner();
 		zielfelderreicht();
+		setzegegner();
 
 		let aktuellezeit = new Date();
 		restzeit = spielzeit - Math.floor((aktuellezeit.getTime()-startzeit.getTime())/1000);
@@ -67,6 +70,44 @@ $(document).ready(function() {
 		clearInterval(takt);
 		$('#spielendeanzeige').show();
 	}
+
+	function setzegegner() {
+		for (nr = 0 ; nr < gegnerpositionen.length ; nr++) {
+			gegnerpositionen[nr] += gegnerbewegung[nr] * 5;
+			if (gegnerpositionen[nr] > 580 || gegnerpositionen[nr] < 0) {
+				gegnerbewegung[nr] *= -1;
+			}
+			erzeugeGegner(gegnerpositionen[nr], 360-(nr*40));
+		}	
+	}
+
+	function erzeugeGegner(gx, gy) {
+		let img = new Image();
+		img.src ='bilder/gegner.png';
+		img.onload = function() {
+			spielfeld.drawImage(img, gx, gy)
+		}
+	}
+
+	function kollisionspruefungGegner() {
+		for (nr = 0; nr < gegnerpositionen.length; nr++) {
+			let ygeg = 360-(nr*40);
+			if ( Math.abs(x - gegnerpositionen[nr]) < 20 && y == ygeg ) {
+				// Zusammenstoss
+				console.log('Zusammenstoss!!!');
+				console.log( Math.abs(x - gegnerpositionen[nr]) );
+            	console.log( " | y: "+ y );
+            	console.log( " | y: "+ ygeg  + " berechnet ");
+				kollisionsgegner();
+			}
+		}
+	}
+
+	function kollisionsgegner() {
+		clearInterval(takt);
+		$('#gameover').show();
+	}
+
 	$(document).bind('keydown', function(evt) {
 		console.log("Tastaturcode: " + evt.keyCode);
 		switch (evt.keyCode) {
